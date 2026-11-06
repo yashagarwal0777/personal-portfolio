@@ -8,7 +8,7 @@ Featuring a playful 6×6 asymmetrical hand-drawn board layout, a custom vector c
 
 ## 🚀 Live Demo
 
-- **Production URL:** [personal-portfolio](https://personal-portfolio-delta.vercel.app/) *(Deployed on Vercel)*
+- **Production URL:** [https://personal-portfolio-eight-zeta-33.vercel.app](https://personal-portfolio-eight-zeta-33.vercel.app)
 - **GitHub Repository:** [https://github.com/yashagarwal0777/personal-portfolio](https://github.com/yashagarwal0777/personal-portfolio)
 
 ---
