@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { portfolioData } from './data/portfolioData';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { PortfolioProvider, usePortfolio } from './context/PortfolioContext';
 import CustomCursor from './components/CustomCursor';
 import LoadingScreen from './components/LoadingScreen';
 import BoardCard from './components/BoardCard';
@@ -8,15 +9,19 @@ import IncognitoToggle from './components/IncognitoToggle';
 import IncognitoView from './components/IncognitoView';
 import Modal from './components/Modal';
 import Hud from './components/Hud';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ProtectedRoute from './pages/admin/ProtectedRoute';
 
-export default function App() {
+function PublicPortfolio() {
+  const { portfolioData } = usePortfolio();
+  const { profile, cards } = portfolioData;
+
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
   const [isIncognito, setIsIncognito] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [focusedCardIndex, setFocusedCardIndex] = useState(0);
-
-  const { profile, cards } = portfolioData;
 
   const showToast = useCallback((msg) => {
     setToastMessage(msg);
@@ -38,9 +43,16 @@ export default function App() {
         setFocusedCardIndex((prev) => (prev - 1 + cards.length) % cards.length);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        setActiveSection(cards[focusedCardIndex].id);
+        if (cards[focusedCardIndex]) {
+          setActiveSection(cards[focusedCardIndex].id);
+        }
       } else if (e.key.toLowerCase() === 'i') {
         setIsIncognito((prev) => !prev);
+      } else if (['1', '2', '3', '4', '5', '6', '7'].includes(e.key)) {
+        const num = parseInt(e.key, 10) - 1;
+        if (cards[num]) {
+          setActiveSection(cards[num].id);
+        }
       }
     };
 
@@ -53,11 +65,9 @@ export default function App() {
   };
 
   const handleStatClick = (statLabel) => {
-    if (statLabel.includes('site')) {
+    if (statLabel.includes('site') || statLabel.includes('intern') || statLabel.includes('exp')) {
       setActiveSection('experience');
-    } else if (statLabel.includes('intern')) {
-      setActiveSection('experience');
-    } else if (statLabel.includes('cert')) {
+    } else if (statLabel.includes('cert') || statLabel.includes('badge')) {
       setActiveSection('certifications');
     } else {
       setActiveSection('about');
@@ -80,7 +90,7 @@ export default function App() {
         onToggle={() => setIsIncognito((prev) => !prev)}
       />
 
-      {/* Secret Incognito Overlay Screen */}
+      {/* Secret Incognito Overlay Screen with Admin Login */}
       {isIncognito && (
         <IncognitoView
           onClose={() => setIsIncognito(false)}
@@ -136,7 +146,7 @@ export default function App() {
 
             {/* Quick Stat Badges */}
             <div className="hero__stats">
-              {profile.stats.map((st) => (
+              {(profile.stats || []).map((st) => (
                 <div
                   key={st.id}
                   className="hstat"
@@ -221,5 +231,138 @@ export default function App() {
         <span>{toastMessage}</span>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <PortfolioProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Portfolio Route */}
+          <Route path="/" element={<PublicPortfolio />} />
+
+          {/* Dedicated Admin Login Route */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=profile" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/about"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=about" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/projects"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=projects" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/experience"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=experience" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/education"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=education" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/skills"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=skills" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/certifications"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=certifications" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/hobbies"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=hobbies" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/social"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=social" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/resume"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=resume" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/contact"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=contact" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/admin/dashboard?tab=settings" replace />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </PortfolioProvider>
   );
 }

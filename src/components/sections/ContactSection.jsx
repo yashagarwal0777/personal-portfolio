@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { dbService } from '../../lib/supabase';
 
 export default function ContactSection({ data, onToast }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -28,6 +29,11 @@ export default function ContactSection({ data, onToast }) {
 
     setIsSubmitting(true);
     setStatus({ text: 'Sending your message…', type: 'busy' });
+
+    // Submit to Supabase database asynchronously
+    dbService.submitContactMessage({ name, email, message }).catch((err) => {
+      console.warn('Failed to save contact message to database:', err);
+    });
 
     setTimeout(() => {
       setIsSubmitting(false);

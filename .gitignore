@@ -36,3 +36,6 @@ test_screenshots/
 *.njsproj
 *.sln
 *.sw?
+
+.vercel
+.env*
